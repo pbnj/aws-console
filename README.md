@@ -2,6 +2,16 @@
 
 > Launch AWS Console from the command-line
 
+## The Problem
+
+There is no easy way to launch, or go to, the AWS console of a particular account, short of saving the page as a browser bookmark.
+
+## This Solution
+
+This CLI application allows users, who are typically familiar with the command-line, to launch AWS console from the command-line.
+
+This application relies on the AWS credentials file stored under the current user's home directory (e.g. `$HOME/.aws/credentials`).
+
 ## Install
 
 ```sh
