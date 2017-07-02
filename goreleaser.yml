@@ -1,0 +1,20 @@
+release:
+  github:
+    owner: petermbenjamin
+    name: aws-console
+
+build:
+  goos:
+  - linux
+  - darwin
+  - windows
+  goarch:
+  - amd64
+  main: cmd/aws-console/
+  binary: aws-console
+
+archive:
+  format: zip
+  files:
+  - LICENSE*
+  - README*
