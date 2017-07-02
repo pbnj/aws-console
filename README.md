@@ -14,9 +14,12 @@ This application relies on the AWS credentials file stored under the current use
 
 ## Install
 
-```sh
-go get -u github.com/petermbenjamin/aws-console
-```
+- With Go:
+  ```sh
+  go get -u github.com/petermbenjamin/aws-console
+  ```
+
+- [Precompiled binaries][download-link]
 
 ## Usage
 
@@ -49,6 +52,16 @@ Options:
   aws-console --credentials="/path/to/aws/cred/file"
   ```
 
+## Changelog
+
+### 0.0.1
+
+#### Added
+
+- Initial Release
+
 ## License
 
 MIT &copy; [Peter Benjamin](https://github.com/petermbenjamin)
+
+[download-link]: https://github.com/petermbenjamin/aws-console/releases/latest/
