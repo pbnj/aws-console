@@ -10,7 +10,7 @@ build:
   - windows
   goarch:
   - amd64
-  main: cmd/aws-console/
+  main: cmd/aws-console/main.go
   binary: aws-console
 
 archive:
