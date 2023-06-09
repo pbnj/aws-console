@@ -9,7 +9,7 @@ Launch AWS Console from the command-line.
 ## Install
 
 ```sh
-go install github.com/pbnj/aws-console@latest
+go install github.com/pbnj/aws-console/...@latest
 ```
 
 ## Usage
