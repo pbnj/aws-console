@@ -15,11 +15,12 @@ This application relies on the AWS credentials file stored under the current use
 ## Install
 
 - With Go:
+
   ```sh
-  go get -u github.com/petermbenjamin/aws-console
+  go install github.com/pbnj/aws-console@latest
   ```
 
-- [Precompiled binaries][download-link]
+- [Precompiled binaries](https://github.com/pbnj/aws-console/releases/latest/)
 
 ## Usage
 
@@ -28,7 +29,7 @@ $ aws-console --help
 Usage: aws-console <options>
 Options:
   -c, --credentials string
-        Path to AWS credentials file (default "/Users/pbenjamin/.aws/credentials")
+        Path to AWS credentials file (default "$HOME/.aws/credentials")
   -d, --debug
         Debug
   -h, --help
@@ -45,7 +46,7 @@ Options:
   ```
 - To launch AWS console using some-other-account profile:
   ```sh
-  aws-console --profile=some-other-account
+  aws-console --profile=profile-name
   ```
 - If your `.aws/credentials` file is stored in a different location:
   ```sh
@@ -62,6 +63,4 @@ Options:
 
 ## License
 
-MIT &copy; [Peter Benjamin](https://github.com/petermbenjamin)
-
-[download-link]: https://github.com/petermbenjamin/aws-console/releases/latest/
+MIT &copy; [Peter Benjamin](https://github.com/pbnj)

@@ -1,20 +1,20 @@
 release:
   github:
-    owner: petermbenjamin
+    owner: pbnj
     name: aws-console
 
 build:
   goos:
-  - linux
-  - darwin
-  - windows
+    - linux
+    - darwin
+    - windows
   goarch:
-  - amd64
+    - amd64
   main: cmd/aws-console/main.go
   binary: aws-console
 
 archive:
   format: zip
   files:
-  - LICENSE*
-  - README*
+    - LICENSE*
+    - README*

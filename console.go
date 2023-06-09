@@ -1,18 +1,14 @@
 package console
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 
-	"github.com/Sirupsen/logrus"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/fatih/color"
+	"github.com/aws/aws-sdk-go-v2/config"
 )
 
 const (
@@ -20,7 +16,7 @@ const (
 	signinURL  = "https://signin.aws.amazon.com/federation"
 )
 
-// Session represents AWS Console session
+// Session represents an AWS Federation session
 type Session struct {
 	SessionID    string `json:"sessionId"`
 	SessionKey   string `json:"sessionKey"`
@@ -33,39 +29,15 @@ type Token struct {
 }
 
 // URL returns the AWS Console URL
-func URL(userName, awsCredFileFlag, awsProfileFlag string) (string, error) {
-	creds := credentials.NewSharedCredentials(awsCredFileFlag, awsProfileFlag)
-
-	sess := session.Must(session.NewSession())
-	svc := sts.New(sess, aws.NewConfig().WithCredentials(creds))
-
-	tokenOutput, err := svc.GetFederationToken(
-		&sts.GetFederationTokenInput{
-			Name: aws.String(userName),
-			Policy: aws.String(
-				`{
-					"Version": "2012-10-17",
-					"Statement": [
-						{
-							"Sid": "Stmt1437414476731",
-							"Action": "*",
-							"Effect": "Allow",
-							"Resource": "*"
-						}
-					]
-				}`,
-			),
-		})
-	if err != nil {
-		return "", fmt.Errorf("could not get federation token: %v", err)
-	}
-
-	logrus.Debugf("Credentials from AWS Federation: %+v\n", *tokenOutput.Credentials)
+func URL(userName, awsProfile string) (string, error) {
+	ctx := context.Background()
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithSharedConfigProfile(awsProfile))
+	creds, err := cfg.Credentials.Retrieve(ctx)
 
 	loginSession := &Session{
-		SessionID:    *tokenOutput.Credentials.AccessKeyId,
-		SessionKey:   *tokenOutput.Credentials.SecretAccessKey,
-		SessionToken: *tokenOutput.Credentials.SessionToken,
+		SessionID:    creds.AccessKeyID,
+		SessionKey:   creds.SecretAccessKey,
+		SessionToken: creds.SessionToken,
 	}
 
 	loginSessionJSON, err := json.Marshal(loginSession)
@@ -79,8 +51,6 @@ func URL(userName, awsCredFileFlag, awsProfileFlag string) (string, error) {
 		"&Session=" +
 		url.QueryEscape(string(loginSessionJSON))
 
-	logrus.Debugf("Signin Token URL: %+v\n", signinTokenURL)
-
 	resp, err := http.Get(signinTokenURL)
 	if err != nil {
 		return "", fmt.Errorf("could not get sign-in token URL: %v", err)
@@ -89,7 +59,7 @@ func URL(userName, awsCredFileFlag, awsProfileFlag string) (string, error) {
 
 	respJSON, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		color.Red(err.Error())
+		return "", err
 	}
 
 	var token Token
@@ -98,11 +68,11 @@ func URL(userName, awsCredFileFlag, awsProfileFlag string) (string, error) {
 		return "", fmt.Errorf("could not unmarshal JSON token: %v", err)
 	}
 
-	logrus.Debugf("Token from AWS Federation: %+v\n", token)
-
-	awsConsoleURL := signinURL + "?Action=login" + "&SigninToken=" + url.QueryEscape(token.SigninToken) + "&Issuer=" + userName + "&Destination=" + url.QueryEscape(consoleURL)
-
-	logrus.Debugf("AWS Console URL to be launched: %+v\n", awsConsoleURL)
+	awsConsoleURL := signinURL +
+		"?Action=login" +
+		"&SigninToken=" + url.QueryEscape(token.SigninToken) +
+		"&Issuer=" + userName +
+		"&Destination=" + url.QueryEscape(consoleURL)
 
 	return awsConsoleURL, nil
 }

@@ -1,70 +1,62 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/user"
-	"path/filepath"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/fatih/color"
-	flag "github.com/ogier/pflag"
-	console "github.com/petermbenjamin/aws-console"
-	open "github.com/petermbenjamin/go-open"
+	console "github.com/pbnj/aws-console"
+	open "github.com/pbnj/go-open"
 )
 
 // Version is the version of this Go binary
-const Version = "0.0.1"
+const Version = "0.1.0"
 
-var (
-	debugFlag       = flag.BoolP("debug", "d", false, "Debug")
-	helpFlag        = flag.BoolP("help", "h", false, "Print Help")
-	versionFlag     = flag.BoolP("version", "v", false, "Print Version")
-	awsCredFileFlag string
-	awsProfileFlag  string
+func main() {
+	var (
+		help       = flag.Bool("h", false, "Print Help")
+		version    = flag.Bool("v", false, "Print Version")
+		awsProfile string
 
-	currentUser *user.User
-	userName    string
-	homeDir     string
-)
+		Usage = func() {
+			fmt.Printf("Usage of %s:\n", os.Args[0])
+			flag.PrintDefaults()
+			os.Exit(1)
+		}
+		currentUser *user.User
+		userName    string
+	)
 
-func setup() {
 	currentUser, err := user.Current()
 	if err != nil {
-		color.Red(err.Error())
+		log.Fatal(err.Error())
 	}
 
 	userName = currentUser.Username
-	homeDir = currentUser.HomeDir
-}
-func init() {
-	setup()
-	flag.StringVarP(&awsCredFileFlag, "credentials", "c", filepath.Join(homeDir, ".aws", "credentials"), "Path to AWS credentials file")
-	flag.StringVarP(&awsProfileFlag, "profile", "p", "default", "AWS Profile")
-}
+	flag.StringVar(&awsProfile, "p", "", "AWS Profile")
 
-func main() {
 	flag.Parse()
 
-	if *debugFlag {
-		log.SetLevel(log.DebugLevel)
-	}
-
-	if *versionFlag {
+	if *version {
 		fmt.Println(Version)
 		os.Exit(0)
 	}
 
-	if *helpFlag {
-		fmt.Println("Usage: aws-console <options>")
-		fmt.Println("Options:")
-		flag.PrintDefaults()
+	if *help {
+		Usage()
 		os.Exit(0)
 	}
 
-	awsConsoleURL, err := console.URL(userName, awsCredFileFlag, awsProfileFlag)
+	if awsProfile == "" {
+		log.Println("-p is required")
+		Usage()
+	}
+
+	awsConsoleURL, err := console.URL(userName, awsProfile)
 	if err != nil {
-		color.Red(err.Error())
+		log.Fatal(err)
 	}
 	open.Open(awsConsoleURL)
 }
