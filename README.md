@@ -2,58 +2,39 @@
 
 > Launch AWS Console from the command-line
 
-## The Problem
+## Overview
 
-There is no easy way to launch, or go to, the AWS console of a particular account, short of saving the page as a browser bookmark.
-
-## This Solution
-
-This CLI application allows users, who are typically familiar with the command-line, to launch AWS console from the command-line.
-
-This application relies on the AWS credentials file stored under the current user's home directory (e.g. `$HOME/.aws/credentials`).
+Launch AWS Console from the command-line.
 
 ## Install
 
-- With Go:
-
-  ```sh
-  go install github.com/pbnj/aws-console@latest
-  ```
-
-- [Precompiled binaries](https://github.com/pbnj/aws-console/releases/latest/)
+```sh
+go install github.com/pbnj/aws-console@latest
+```
 
 ## Usage
 
 ```sh
-$ aws-console --help
-Usage: aws-console <options>
-Options:
-  -c, --credentials string
-        Path to AWS credentials file (default "$HOME/.aws/credentials")
-  -d, --debug
-        Debug
-  -h, --help
-        Print Help
-  -p, --profile string
-        AWS Profile (default "default")
+$ aws-console -h
+Usage of aws-console:
+  -h Print Help
+  -p string
+     AWS Profile
+  -v Print Version
 ```
 
-### Examples
+Example, assuming you have a `~/.aws/config` with a profile named `my-profile`:
 
-- To launch AWS console using default profile credentials:
-  ```sh
-  aws-console
-  ```
-- To launch AWS console using some-other-account profile:
-  ```sh
-  aws-console --profile=profile-name
-  ```
-- If your `.aws/credentials` file is stored in a different location:
-  ```sh
-  aws-console --credentials="/path/to/aws/cred/file"
-  ```
+```sh
+aws-console -p my-profile
+```
 
 ## Changelog
+
+### 0.1.0
+
+- Upgrade to aws-sdk-go-v2
+- Switch to go modules
 
 ### 0.0.1
 
@@ -63,4 +44,4 @@ Options:
 
 ## License
 
-MIT &copy; [Peter Benjamin](https://github.com/pbnj)
+MIT
